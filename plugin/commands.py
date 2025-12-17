@@ -4,29 +4,29 @@ from typing import Any, Callable, Dict, List, Union
 import sublime
 import sublime_plugin
 
-from .api_client import AsyncGemini
+from .api_client import AsyncSimpleAI
 
 # Import necessary functions and classes from their new locations
 from .settings import evaluate_completion_snippet, evaluate_instruction_snippet, get_setting, whole_file_as_context
 
-logger = logging.getLogger("GeminiAIPlugin")
+logger = logging.getLogger("SimpleAIPlugin")
 
 
-class GeminiCommand(sublime_plugin.TextCommand):
+class SimpleAICommand(sublime_plugin.TextCommand):
     """
-    Base class for Gemini AI commands, providing common setup and thread handling.
+    Base class for Simple AI commands, providing common setup and thread handling.
     """
 
     def check_setup(self) -> None:
         """
-        Performs checks to ensure Gemini AI can run, such as API key presence
+        Performs checks to ensure Simple AI can run, such as API key presence
         and selection validity.
         Raises ValueError if setup is incomplete or invalid.
         """
         key: Union[str, None] = get_setting(self.view, "api_token", None)
 
         if key is None:
-            msg: str = "Please put an 'api_token' in the GeminiAI package settings"
+            msg: str = "Please put an 'api_token' in the Simple AI package settings"
             sublime.error_message(msg)
             raise ValueError(msg)
 
@@ -44,14 +44,14 @@ class GeminiCommand(sublime_plugin.TextCommand):
             raise ValueError(msg)
 
     def handle_thread(
-        self, thread: "AsyncGemini", label: str, on_success_callback: Callable[["AsyncGemini"], None], seconds: int = 0
+        self, thread: "AsyncSimpleAI", label: str, on_success_callback: Callable[["AsyncSimpleAI"], None], seconds: int = 0
     ) -> None:
         """
-        Recursively checks the status of the AsyncGemini thread and updates the UI
+        Recursively checks the status of the AsyncSimpleAI thread and updates the UI
         or shows feedback. Dispatches UI updates to the main thread.
 
         Args:
-            thread: The AsyncGemini thread instance.
+            thread: The AsyncSimpleAI thread instance.
             label: A string label for the command (e.g., "completions", "instruct").
             on_success_callback: A callable function to execute when the thread finishes successfully.
                                  It will receive the thread instance as an argument.
@@ -61,34 +61,34 @@ class GeminiCommand(sublime_plugin.TextCommand):
 
         if seconds > max_seconds:
             logger.debug("Thread for {} is maxed out".format(label))
-            msg: str = "Gemini ran out of time! {}s".format(max_seconds)
+            msg: str = "Simple AI ran out of time! {}s".format(max_seconds)
             sublime.status_message(msg)
             return
 
         if thread.running:
             logger.debug("Thread for {} is running".format(label))
-            msg: str = "Gemini is thinking, one moment... ({}/{}s)".format(seconds, max_seconds)
+            msg: str = "Simple AI is thinking, one moment... ({}/{}s)".format(seconds, max_seconds)
             sublime.status_message(msg)
             sublime.set_timeout(lambda: self.handle_thread(thread, label, on_success_callback, seconds + 1), 1000)
             return
 
         if thread.error:
             logger.error("Thread for {} finished with error: {}".format(label, thread.error))
-            sublime.error_message("Gemini AI Error: {}".format(thread.error))
+            sublime.error_message("Simple AI Error: {}".format(thread.error))
             return
 
         if not thread.result:
             logger.debug("Thread for {} is done, but no result found.".format(label))
-            sublime.status_message("Something is wrong with Gemini - aborting (no result)")
+            sublime.status_message("Something is wrong with Simple AI - aborting (no result)")
             return
 
         logger.debug("Thread for {} finished successfully. Calling on_success_callback.".format(label))
         sublime.set_timeout(lambda: on_success_callback(thread), 0)
 
 
-class GeminiBaseAiCommand(GeminiCommand):
+class SimpleAIBaseCommand(SimpleAICommand):
     """
-    Abstract base class for Gemini AI commands, providing common logic for
+    Abstract base class for Simple AI commands, providing common logic for
     preparing data and handling successful API responses.
     """
 
@@ -101,7 +101,7 @@ class GeminiBaseAiCommand(GeminiCommand):
 
     def get_prompt_data(self, source_code: str, user_input: Union[str, None] = None) -> Dict[str, Any]:
         """
-        Constructs the data payload for the Gemini API request.
+        Constructs the data payload for the AI API request.
         Must be implemented by subclasses.
 
         Args:
@@ -111,15 +111,15 @@ class GeminiBaseAiCommand(GeminiCommand):
         """
         raise NotImplementedError("Subclasses must implement get_prompt_data()")
 
-    def on_api_success(self, thread: "AsyncGemini") -> None:
+    def on_api_success(self, thread: "AsyncSimpleAI") -> None:
         """
-        Callback executed when the AsyncGemini thread finishes successfully.
+        Callback executed when the AsyncSimpleAI thread finishes successfully.
         Contains the logic for handling the API response (e.g., inserting text,
         opening new tab). Must be implemented by subclasses.
         """
         raise NotImplementedError("Subclasses must implement on_api_success()")
 
-    def _prepare_and_run_gemini_thread(self, source_code: str, user_input: Union[str, None] = None) -> None:
+    def _prepare_and_run_ai_thread(self, source_code: str, user_input: Union[str, None] = None) -> None:
         """
         Internal method to prepare the data, create the thread, and start monitoring it.
         """
@@ -140,14 +140,14 @@ class GeminiBaseAiCommand(GeminiCommand):
 
         region: sublime.Region = self.view.sel()[0] if self.view.sel() else sublime.Region(0, 0)
 
-        thread: AsyncGemini = AsyncGemini(self.view, region, data, instruction)
+        thread: AsyncSimpleAI = AsyncSimpleAI(self.view, region, data, instruction)
         thread.start()
         self.handle_thread(thread, command_name, self.on_api_success)
 
 
-class CompletionGeminiCommand(GeminiBaseAiCommand):
+class CompletionSimpleAICommand(SimpleAIBaseCommand):
     """
-    Provides a prompt of text/code for Gemini to complete.
+    Provides a prompt of text/code for Simple AI to complete.
     """
 
     def get_command_info(self) -> str:
@@ -173,7 +173,7 @@ class CompletionGeminiCommand(GeminiBaseAiCommand):
             },
         }
 
-    def on_api_success(self, thread: "AsyncGemini") -> None:
+    def on_api_success(self, thread: "AsyncSimpleAI") -> None:
         logger.debug("Running command for `{}` with content: {}".format(self.get_command_info(), thread.result))
         sublime.set_timeout(
             lambda: self.view.run_command(
@@ -185,7 +185,7 @@ class CompletionGeminiCommand(GeminiBaseAiCommand):
             ),
             0,
         )
-        sublime.status_message("Gemini AI completion inserted.")
+        sublime.status_message("Simple AI completion inserted.")
 
     def run(self, edit: sublime.Edit):
         try:
@@ -203,12 +203,12 @@ class CompletionGeminiCommand(GeminiBaseAiCommand):
         region: sublime.Region = self.view.sel()[0]
         content: str = self.view.substr(region)
 
-        self._prepare_and_run_gemini_thread(content)
+        self._prepare_and_run_ai_thread(content)
 
 
-class InstructGeminiCommand(GeminiBaseAiCommand):
+class InstructSimpleAICommand(SimpleAIBaseCommand):
     """
-    Provides a prompt of text/code to Gemini along with an instruction of how to
+    Provides a prompt of text/code to Simple AI along with an instruction of how to
     modify the prompt, while trying to keep the functionality the same.
     """
 
@@ -234,7 +234,7 @@ class InstructGeminiCommand(GeminiBaseAiCommand):
             },
         }
 
-    def on_api_success(self, thread: "AsyncGemini") -> None:
+    def on_api_success(self, thread: "AsyncSimpleAI") -> None:
         logger.debug("Running command for `{}` with content: {}".format(self.get_command_info(), thread.result))
         sublime.set_timeout(
             lambda: self.view.run_command(
@@ -243,7 +243,7 @@ class InstructGeminiCommand(GeminiBaseAiCommand):
             ),
             100,
         )
-        sublime.status_message("Gemini AI instruction opened in new tab.")
+        sublime.status_message("Simple AI instruction opened in new tab.")
 
     def run(self, edit: sublime.Edit):
         window: Union[sublime.Window, None] = self.view.window()
@@ -276,7 +276,7 @@ class InstructGeminiCommand(GeminiBaseAiCommand):
         if use_whole_file:
             source_code = whole_file_as_context(self.view)
 
-        self._prepare_and_run_gemini_thread(source_code, user_input)
+        self._prepare_and_run_ai_thread(source_code, user_input)
 
     def on_input_cancel(self) -> None:
         sublime.status_message("Input canceled.")
@@ -309,7 +309,7 @@ class OpenNewTabWithContentCommand(sublime_plugin.TextCommand):
         new_view.set_scratch(True)
         new_view.set_read_only(False)
 
-        new_view.set_name("Gemini Results")
+        new_view.set_name("Simple AI Results")
         new_view.assign_syntax("Packages/Markdown/MultiMarkdown.sublime-syntax")
         new_view.settings().set("scroll_past_end", True)
         new_view.settings().set("gutter", True)

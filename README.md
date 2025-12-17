@@ -1,9 +1,33 @@
-Sublime Gemini
+
+> This project is inspired by [necarlson97/codex-ai-sublime](https://github.com/necarlson97/codex-ai-sublime) but refactored with the help of AI
+
+Simple AI is a powerful Sublime Text plugin that integrates AI directly into your editor, enhancing your coding workflow with intelligent assistance. From generating code snippets to refactoring and answering programming questions, Simple AI brings the power of AI to your fingertips.
+
+### Install
+
+```sh
+# change to the directory found with "Preference: Browse Packages", then clone
+git clone https://github.com/james2doyle/sublime-gemini.git GeminiAI
+```
+=======
+Simple AI
 =================
 
-> This project is inspired by [necarlson97/codex-ai-sublime](https://github.com/necarlson97/codex-ai-sublime) but refactored with the help of Gemini
+> This project is inspired by [necarlson97/codex-ai-sublime](https://github.com/necarlson97/codex-ai-sublime) but refactored with the help of AI
 
-Sublime Gemini is a powerful Sublime Text plugin that integrates Google's Gemini AI directly into your editor, enhancing your coding workflow with intelligent assistance. From generating code snippets to refactoring and answering programming questions, Sublime Gemini brings the power of AI to your fingertips.
+Simple AI is a powerful Sublime Text plugin that integrates AI directly into your editor, enhancing your coding workflow with intelligent assistance. From generating code snippets to refactoring and answering programming questions, Simple AI brings the power of AI to your fingertips.
+
+### Install
+
+```sh
+# change to the directory found with "Preference: Browse Packages", then clone
+git clone https://github.com/james2doyle/sublime-gemini.git SimpleAI
+```
+=================
+
+> This project is inspired by [necarlson97/codex-ai-sublime](https://github.com/necarlson97/codex-ai-sublime) but refactored with the help of AI
+
+Simple AI is a powerful Sublime Text plugin that integrates AI directly into your editor, enhancing your coding workflow with intelligent assistance. From generating code snippets to refactoring and answering programming questions, Simple AI brings the power of AI to your fingertips.
 
 ### Install
 
@@ -18,7 +42,7 @@ git clone https://github.com/james2doyle/sublime-gemini.git GeminiAI
 
 **Code Generation**: Generate functions, classes, or entire code blocks based on your natural language prompts.
 
-**Code Refactoring**: Ask Gemini to refactor selected code for improved readability, performance, or adherence to best practices.
+**Code Refactoring**: Ask Simple AI to refactor selected code for improved readability, performance, or adherence to best practices.
 
 **Contextual Q&A**: Ask questions about your code, programming concepts, or general knowledge, and get instant answers within Sublime Text.
 
@@ -28,11 +52,11 @@ git clone https://github.com/james2doyle/sublime-gemini.git GeminiAI
 
 ### Commands
 
-#### `completion_gemini`
+#### `completion_simple_ai`
 
-Write an incomplete part of text and have Gemini try and complete it. Useful for completing functions or code. Requires some code to be selected.
+Write an incomplete part of text and have Simple AI try and complete it. Useful for completing functions or code. Requires some code to be selected.
 
-#### `instruct_gemini`
+#### `instruct_simple_ai`
 
 Select some code and then provide an additional prompt for it. Useful for asking questions about code or wanting to ask for a rewrite of the selected code. If no code is selected, the entire file content is sent.
 
@@ -43,21 +67,21 @@ Select some code and then provide an additional prompt for it. Useful for asking
 1. Open Sublime Text.
 1. Go to Tools > Command Palette... (or press Ctrl+Shift+P / Cmd+Shift+P).
 1. Type Package Control: Install Package and press Enter.
-1. Search for Sublime Gemini and press Enter to install.
+1. Search for Simple AI and press Enter to install.
 
 #### Manual Installation
 
 1. Navigate to your Sublime Text Packages directory. You can find this by going to Preferences > Browse Packages... in Sublime Text.
-1. Run `git clone https://github.com/james2doyle/sublime-gemini GeminiAI` in that folder
+1. Run `git clone https://github.com/james2doyle/sublime-gemini SimpleAI` in that folder
 
 ### Configuration
 
-Before using Sublime Gemini, you need to configure your Google Gemini API key.
+Before using Simple AI, you need to configure your AI API key.
 Obtain your API key from the Google AI Studio.
 
-In Sublime Text, go to Preferences > Package Settings > Sublime Gemini > Settings.
+In Sublime Text, go to Preferences > Package Settings > Simple AI > Settings.
 
-Add your API key to the `sublime_gemini.sublime-settings` file:
+Add your API key to the `simple_ai.sublime-settings` file:
 
 ```jsonc
 {
@@ -65,7 +89,7 @@ Add your API key to the `sublime_gemini.sublime-settings` file:
 }
 ```
 
-Important: Replace `"YOUR_API_KEY_HERE"` with your actual Gemini API key.
+Important: Replace `"YOUR_API_KEY_HERE"` with your actual AI API key.
 
 #### Project Configuration
 
@@ -77,7 +101,7 @@ In your `sublime-project` file:
 {
     // ... folders array with paths, etc.
     "settings": {
-        "GeminiAI": {
+        "SimpleAI": {
             "api_token": "YOUR_API_KEY_HERE"
         }
         // ... the rest of your settings
@@ -85,7 +109,7 @@ In your `sublime-project` file:
 }
 ```
 
-The settings code will check your local `sublime-project` first and then the global User `sublime_gemini.sublime-settings` file. So the project settings take priority.
+The settings code will check your local `sublime-project` first and then the global User `simple_ai.sublime-settings` file. So the project settings take priority.
 
 #### Custom Prompts
 
@@ -95,7 +119,7 @@ You can also provide custom snippets for the prompts that are used during `instr
 {
     // ... folders array with paths, etc.
     "settings": {
-        "GeminiAI": {
+        "SimpleAI": {
             "api_token": "YOUR_API_KEY_HERE",
             "completions": {
                 "prompt_snippet": "Packages/User/my_completion_prompt.sublime-snippet"
@@ -124,14 +148,14 @@ You can view the current snippets that are using in the `snippets` directory.
 
 ### Usage
 
-Sublime Gemini provides several commands accessible via the Command Palette or custom key bindings.
+Simple AI provides several commands accessible via the Command Palette or custom key bindings.
 
 #### Command Palette
 
 1. Open Tools > Command Palette... (Ctrl+Shift+P / Cmd+Shift+P).
-1. Type Gemini to see available commands:
-  - Gemini: Complete Code: Generates the rest of the code that has been selected.
-  - Gemini: Instruct Code: Add an additional prompt to the selected code.
+1. Type Simple AI to see available commands:
+  - Simple AI: Complete Code: Generates the rest of the code that has been selected.
+  - Simple AI: Instruct Code: Add an additional prompt to the selected code.
 
 #### Key Bindings
 
@@ -139,8 +163,8 @@ You can set up custom key bindings for frequently used commands. Go to Preferenc
 
 ```jsonc
 [
-    { "keys": ["ctrl+alt+g", "ctrl+alt+c"], "command": "completion_gemini" },
-    { "keys": ["ctrl+alt+g", "ctrl+alt+g"], "command": "instruct_gemini" }
+    { "keys": ["ctrl+alt+g", "ctrl+alt+c"], "command": "completion_simple_ai" },
+    { "keys": ["ctrl+alt+g", "ctrl+alt+g"], "command": "instruct_simple_ai" }
 ]
 ```
 
@@ -148,8 +172,8 @@ You can set up custom key bindings for frequently used commands. Go to Preferenc
 
 #### Project Structure
 
-- `gemini_ai.py`: Main plugin entry point and core logic.
-- `plugin/api_client.py`: Handles communication with the Google Gemini API.
+- `simple_ai.py`: Main plugin entry point and core logic.
+- `plugin/api_client.py`: Handles communication with the AI API.
 - `plugin/commands.py`: Defines the Sublime Text commands for AI interactions.
 - `plugin/listeners.py`: Contains event listeners for various Sublime Text events (e.g., selection changes).
 - `plugin/settings.py`: Manages plugin settings and API key storage.

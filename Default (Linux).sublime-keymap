@@ -1,16 +1,16 @@
 [
-  // Request a prompt based on the highlighted text from gemini
+  // Request a prompt based on the highlighted text from Simple AI
   {
     "keys": [
       "ctrl+shift+insert"
     ],
-    "command": "completion_gemini"
+    "command": "completion_simple_ai"
   },
   // Instruct a type of edit on the highlighted text
   {
     "keys": [
       "ctrl+shift+end"
     ],
-    "command": "instruct_gemini"
+    "command": "instruct_simple_ai"
   },
 ]

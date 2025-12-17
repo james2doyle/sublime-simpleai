@@ -4,8 +4,8 @@ from typing import Any, Dict, Union
 
 import sublime
 
-SETTINGS_FILE = "gemini-ai.sublime-settings"
-logger = logging.getLogger("GeminiAIPlugin")
+SETTINGS_FILE = "simple-ai.sublime-settings"
+logger = logging.getLogger("SimpleAIPlugin")
 
 
 def plugin_settings() -> sublime.Settings:
@@ -14,8 +14,8 @@ def plugin_settings() -> sublime.Settings:
 
 
 def view_settings(view: sublime.View) -> Dict[str, Any]:
-    """Returns a dictionary representation of the GeminiAI settings specific to the view."""
-    return view.settings().get("GeminiAI", {})
+    """Returns a dictionary representation of the SimpleAI settings specific to the view."""
+    return view.settings().get("SimpleAI", {})
 
 
 def get_setting(view: sublime.View, key: str, default: Any = None) -> Any:
@@ -50,7 +50,7 @@ def _update_logging_level() -> None:
     if debug_logging:
         logging.basicConfig(level=logging.DEBUG)
         logger.setLevel(logging.DEBUG)
-        logger.debug("Gemini AI Plugin logging enabled.")
+        logger.debug("Simple AI Plugin logging enabled.")
     else:
         logging.basicConfig(level=logging.CRITICAL)
         logger.setLevel(logging.CRITICAL)  # Effectively disable logging
@@ -89,7 +89,7 @@ def evaluate_completion_snippet(view: sublime.View, selected_code: str) -> str:
 
     custom_variables = {
         "name": completions_settings.get(
-            "prompt_snippet", "Packages/GeminiAI/snippets/completion_prompt.sublime-snippet"
+            "prompt_snippet", "Packages/SimpleAI/snippets/completion_prompt.sublime-snippet"
         ),
         "OS": variables.get("platform"),
         "SHELL": os.path.basename(shell_path),
@@ -148,7 +148,7 @@ def evaluate_instruction_snippet(view: sublime.View, user_instruction: str, sele
     instruct_settings = get_setting(view, "instruct")
 
     custom_variables = {
-        "name": instruct_settings.get("prompt_snippet", "Packages/GeminiAI/snippets/instruct_prompt.sublime-snippet"),
+        "name": instruct_settings.get("prompt_snippet", "Packages/SimpleAI/snippets/instruct_prompt.sublime-snippet"),
         "OS": variables.get("platform"),
         "SHELL": os.path.basename(shell_path),
         "SYNTAX": syntax_name.lower(),
