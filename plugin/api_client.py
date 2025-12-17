@@ -54,83 +54,116 @@ class AsyncSimpleAI(threading.Thread):
 
     def get_ai_response(self) -> str:
         """
-        Passes the given data to the AI API, returning the response.
+        Passes the given data to the API, returning the response.
         Raises ValueError if API token is missing or if the API returns an error.
         """
         token: Union[str, None] = get_setting(self.view, "api_token", None)
-        hostname: str = get_setting(self.view, "hostname", "generativelanguage.googleapis.com")
-        model_name: str = self.data.get("model", "gemini-2.5-flash")
-        api_path: str = "/v1beta/models/{}:generateContent".format(model_name)
+        hostname: str = get_setting(self.view, "hostname", "openrouter.ai")
+        model_name: str = self.data.get("model", "openrouter/auto")
+        api_path: str = "/api/v1/chat/completions"
 
         if token is None:
             raise ValueError("API token is missing.")
 
         conn: http.client.HTTPSConnection = http.client.HTTPSConnection(hostname)
-        headers: Dict[str, str] = {"Content-Type": "application/json"}
+        headers: Dict[str, str] = {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer {}".format(token)
+        }
 
-        payload_for_body = self.data.copy()
-        if "model" in payload_for_body:
-            del payload_for_body["model"]
+        # Transform the Google API payload structure to OpenAI format
+        payload_for_body = self._transform_to_openai_payload(self.data.copy())
 
         data_payload: str = json.dumps(payload_for_body)
         logger.debug("API request data: {}".format(data_payload))
 
-        full_path = "{}?key={}".format(api_path, token)
-        logger.debug("API request path: {}".format(full_path))
+        logger.debug("API request path: {}".format(api_path))
 
-        conn.request("POST", full_path, data_payload, headers)
+        conn.request("POST", api_path, data_payload, headers)
         response: http.client.HTTPResponse = conn.getresponse()
         response_body: str = response.read().decode("utf-8")
         response_dict: Dict[str, Any] = json.loads(response_body)
         logger.debug("API response data: {}".format(response_dict))
 
+        # Handle OpenAI API errors
         if response_dict.get("error", None):
             error_details = response_dict["error"].get("message", "Unknown API error")
             raise ValueError("API Error: {}".format(error_details))
-        else:
-            prompt_feedback = response_dict.get("promptFeedback", {})
-            safety_ratings = prompt_feedback.get("safetyRatings", [])
-            for rating in safety_ratings:
-                if rating.get("blocked"):
-                    raise ValueError(
-                        "Prompt blocked by safety filters: {}".format(rating.get("reason", "Unknown reason"))
-                    )
 
-            candidates: List[Dict[str, Any]] = response_dict.get("candidates", [])
-            if not candidates:
+        # Check for OpenAI-specific error structure
+        if "choices" not in response_dict:
+            raise ValueError("Invalid API response: missing 'choices' field")
+
+        choices: List[Dict[str, Any]] = response_dict.get("choices", [])
+        if not choices:
+            raise ValueError(
+                "AI did not return any choices. The model might have generated no response or encountered an internal issue."
+            )
+
+        first_choice: Dict[str, Any] = choices[0]
+        finish_reason = first_choice.get("finish_reason", None)
+
+        if finish_reason:
+            if finish_reason == "stop":
+                pass
+            elif finish_reason == "length":
+                usage_metadata = response_dict.get("usage", {})
+                total_token_count = usage_metadata.get("total_tokens", 0)
                 raise ValueError(
-                    "AI did not return any candidates. The model might have generated no response or encountered an internal issue."
-                )
-
-            first_candidate: Dict[str, Any] = candidates[0]
-            finish_reason = first_candidate.get("finishReason", None)
-
-            if finish_reason:
-                if finish_reason == "STOP":
-                    pass
-                elif finish_reason == "MAX_TOKENS":
-                    usage_metadata = response_dict.get("usageMetadata", {})
-                    total_token_count = usage_metadata.get("totalTokenCount", 0)
-                    raise ValueError(
-                        "AI finished early due to max tokens limit. Used {} tokens. Try increasing 'max_tokens' in settings.".format(
-                            total_token_count
-                        )
+                    "AI finished early due to max tokens limit. Used {} tokens. Try increasing 'max_tokens' in settings.".format(
+                        total_token_count
                     )
-                elif finish_reason == "SAFETY":
-                    raise ValueError("AI response blocked by safety filters.")
-                elif finish_reason == "RECITATION":
-                    raise ValueError("AI response blocked due to recitation policy.")
-                else:
-                    raise ValueError("AI finished early with reason: {}".format(finish_reason))
+                )
+            elif finish_reason == "content_filter":
+                raise ValueError("AI response blocked by content filters.")
+            else:
+                raise ValueError("AI finished early with reason: {}".format(finish_reason))
 
-            content_parts: List[Dict[str, Any]] = first_candidate.get("content", {}).get("parts", [])
+        message: Dict[str, Any] = first_choice.get("message", {})
+        if not message:
+            raise ValueError("No message found in AI response choice.")
 
-            if not content_parts:
-                raise ValueError("No text content parts found in AI response.")
+        content: str = message.get("content", "")
+        if not content:
+            raise ValueError("No text content found in AI response message.")
 
-            ai_text: str = content_parts[0].get("text", "")
+        return content
 
-            if not ai_text:
-                raise ValueError("No text content found in AI response part.")
+    def _transform_to_openai_payload(self, google_payload: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Transforms the Google Gemini API payload structure to OpenAI format.
+        """
+        openai_payload: Dict[str, Any] = {}
 
-            return ai_text
+        # Extract model from the original payload
+        if "model" in google_payload:
+            openai_payload["model"] = google_payload["model"]
+            del google_payload["model"]
+        else:
+            openai_payload["model"] = "openrouter/auto"  # Default OpenRouter model
+
+        # Transform contents to messages
+        contents = google_payload.get("contents", [])
+        if contents:
+            messages = []
+            for content_item in contents:
+                role = content_item.get("role", "user")
+                parts = content_item.get("parts", [])
+                if parts:
+                    # Combine all text parts into a single content string
+                    text_parts = [part.get("text", "") for part in parts if part.get("text")]
+                    content_text = " ".join(text_parts)
+                    messages.append({"role": role, "content": content_text})
+            openai_payload["messages"] = messages
+
+        # Transform generationConfig to top-level parameters
+        generation_config = google_payload.get("generationConfig", {})
+        if generation_config:
+            if "temperature" in generation_config:
+                openai_payload["temperature"] = generation_config["temperature"]
+            if "top_p" in generation_config:
+                openai_payload["top_p"] = generation_config["top_p"]
+            if "max_output_tokens" in generation_config:
+                openai_payload["max_tokens"] = generation_config["max_output_tokens"]
+
+        return openai_payload

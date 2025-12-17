@@ -12,7 +12,7 @@ from .settings import evaluate_completion_snippet, evaluate_instruction_snippet,
 logger = logging.getLogger("SimpleAIPlugin")
 
 
-class SimpleAICommand(sublime_plugin.TextCommand):
+class SimpleAiCommand(sublime_plugin.TextCommand):
     """
     Base class for Simple AI commands, providing common setup and thread handling.
     """
@@ -86,7 +86,7 @@ class SimpleAICommand(sublime_plugin.TextCommand):
         sublime.set_timeout(lambda: on_success_callback(thread), 0)
 
 
-class SimpleAIBaseCommand(SimpleAICommand):
+class SimpleAiBaseCommand(SimpleAiCommand):
     """
     Abstract base class for Simple AI commands, providing common logic for
     preparing data and handling successful API responses.
@@ -145,7 +145,7 @@ class SimpleAIBaseCommand(SimpleAICommand):
         self.handle_thread(thread, command_name, self.on_api_success)
 
 
-class CompletionSimpleAICommand(SimpleAIBaseCommand):
+class CompletionSimpleAiCommand(SimpleAiBaseCommand):
     """
     Provides a prompt of text/code for Simple AI to complete.
     """
@@ -159,7 +159,7 @@ class CompletionSimpleAICommand(SimpleAIBaseCommand):
         text_for_prompt = evaluate_completion_snippet(self.view, source_code)
 
         return {
-            "model": settingsc.get("model", "gemini-2.5-flash"),
+            "model": settingsc.get("model", "openrouter/auto"),
             "contents": [
                 {
                     "role": "user",
@@ -206,7 +206,7 @@ class CompletionSimpleAICommand(SimpleAIBaseCommand):
         self._prepare_and_run_ai_thread(content)
 
 
-class InstructSimpleAICommand(SimpleAIBaseCommand):
+class InstructSimpleAiCommand(SimpleAiBaseCommand):
     """
     Provides a prompt of text/code to Simple AI along with an instruction of how to
     modify the prompt, while trying to keep the functionality the same.
@@ -221,7 +221,7 @@ class InstructSimpleAICommand(SimpleAIBaseCommand):
         text_for_prompt = evaluate_instruction_snippet(self.view, user_input, source_code)
 
         return {
-            "model": settingse.get("model", "gemini-2.5-flash"),
+            "model": settingse.get("model", "openrouter/auto"),
             "contents": [
                 {
                     "role": "user",

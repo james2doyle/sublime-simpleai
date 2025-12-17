@@ -1,40 +1,9 @@
-
-> This project is inspired by [necarlson97/codex-ai-sublime](https://github.com/necarlson97/codex-ai-sublime) but refactored with the help of AI
-
-Simple AI is a powerful Sublime Text plugin that integrates AI directly into your editor, enhancing your coding workflow with intelligent assistance. From generating code snippets to refactoring and answering programming questions, Simple AI brings the power of AI to your fingertips.
-
-### Install
-
-```sh
-# change to the directory found with "Preference: Browse Packages", then clone
-git clone https://github.com/james2doyle/sublime-gemini.git GeminiAI
-```
-=======
 Simple AI
-=================
+=========
 
 > This project is inspired by [necarlson97/codex-ai-sublime](https://github.com/necarlson97/codex-ai-sublime) but refactored with the help of AI
 
-Simple AI is a powerful Sublime Text plugin that integrates AI directly into your editor, enhancing your coding workflow with intelligent assistance. From generating code snippets to refactoring and answering programming questions, Simple AI brings the power of AI to your fingertips.
-
-### Install
-
-```sh
-# change to the directory found with "Preference: Browse Packages", then clone
-git clone https://github.com/james2doyle/sublime-gemini.git SimpleAI
-```
-=================
-
-> This project is inspired by [necarlson97/codex-ai-sublime](https://github.com/necarlson97/codex-ai-sublime) but refactored with the help of AI
-
-Simple AI is a powerful Sublime Text plugin that integrates AI directly into your editor, enhancing your coding workflow with intelligent assistance. From generating code snippets to refactoring and answering programming questions, Simple AI brings the power of AI to your fingertips.
-
-### Install
-
-```sh
-# change to the directory found with "Preference: Browse Packages", then clone
-git clone https://github.com/james2doyle/sublime-gemini.git GeminiAI
-```
+Simple AI is a powerful Sublime Text plugin that integrates AI directly into your editor (but only when you want it), enhancing your coding workflow with intelligent assistance. From generating code snippets to refactoring and answering programming questions, Simple AI brings the power of AI to your fingertips.
 
 ### Features
 
@@ -54,30 +23,30 @@ git clone https://github.com/james2doyle/sublime-gemini.git GeminiAI
 
 #### `completion_simple_ai`
 
-Write an incomplete part of text and have Simple AI try and complete it. Useful for completing functions or code. Requires some code to be selected.
+Write an incomplete part of text and have Simple AI try and complete it. Useful for completing functions or code. **Requires some code to be selected**.
 
 #### `instruct_simple_ai`
 
-Select some code and then provide an additional prompt for it. Useful for asking questions about code or wanting to ask for a rewrite of the selected code. If no code is selected, the entire file content is sent.
+Select some code and then provide an additional prompt for it. Useful for asking questions about code or wanting to ask for a rewrite of the selected code. If no code is selected, **the entire file content is sent**.
 
 ### Installation
 
-#### Via Package Control (Recommended)
-
-1. Open Sublime Text.
-1. Go to Tools > Command Palette... (or press Ctrl+Shift+P / Cmd+Shift+P).
-1. Type Package Control: Install Package and press Enter.
-1. Search for Simple AI and press Enter to install.
-
-#### Manual Installation
-
 1. Navigate to your Sublime Text Packages directory. You can find this by going to Preferences > Browse Packages... in Sublime Text.
-1. Run `git clone https://github.com/james2doyle/sublime-gemini SimpleAI` in that folder
+1. Run `git clone https://github.com/james2doyle/sublime-simpleai SimpleAI` in that folder
+
+
+```sh
+# change to the directory found with "Preference: Browse Packages", then clone
+git clone https://github.com/james2doyle/sublime-simpleai.git SimpleAI
+```
 
 ### Configuration
 
 Before using Simple AI, you need to configure your AI API key.
-Obtain your API key from the Google AI Studio.
+
+Simple AI can use any OpenAI API compatible service. The easiest way to get access to the most models, in my experience, is using [OpenRouter](https://openrouter.ai/).
+
+The default settings assume you want to use OpenRouter.
 
 In Sublime Text, go to Preferences > Package Settings > Simple AI > Settings.
 
@@ -89,7 +58,7 @@ Add your API key to the `simple_ai.sublime-settings` file:
 }
 ```
 
-Important: Replace `"YOUR_API_KEY_HERE"` with your actual AI API key.
+Important: Replace `"YOUR_API_KEY_HERE"` with your actual API key.
 
 #### Project Configuration
 
@@ -102,7 +71,11 @@ In your `sublime-project` file:
     // ... folders array with paths, etc.
     "settings": {
         "SimpleAI": {
-            "api_token": "YOUR_API_KEY_HERE"
+            "api_token": "YOUR_API_KEY_HERE",
+            // optionally, select specific settings
+            "hostname": "openrouter.ai",
+            "model_name": "openai/gpt-5.2",
+            "api_path": "/api/v1/chat/completions",
         }
         // ... the rest of your settings
     }

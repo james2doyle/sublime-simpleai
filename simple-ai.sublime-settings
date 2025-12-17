@@ -1,19 +1,19 @@
 {
-	"debug_logging": false,
-	"api_token": "<put your key here>",
-	"hostname": "generativelanguage.googleapis.com",
-	"max_seconds": 10,
+	"debug_logging": true,
+	"api_token": "<put your OpenRouter API key here>",
+	"hostname": "openrouter.ai",
+	"max_seconds": 99,
 	"no_empty_selection": false,
 	"completions": {
-		"model": "gemini-2.5-flash",
-		"temperature": 0.0,
+		"model": "openai/gpt-5.2",
+		"temperature": 0.3,
 		"top_p": 1,
 		"max_tokens": 2048,
 		"prompt_snippet": "Packages/SimpleAI/snippets/completion_prompt.sublime-snippet"
 	},
 	"instruct": {
-		"model": "gemini-2.5-flash",
-		"temperature": 0.4,
+		"model": "openai/gpt-5.2",
+		"temperature": 0.3,
 		"top_p": 1,
 		"prompt_snippet": "Packages/SimpleAI/snippets/instruct_prompt.sublime-snippet"
 	}

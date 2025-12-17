@@ -8,8 +8,8 @@ del prefix
 
 from .plugin.api_client import AsyncSimpleAI  # noqa: E402, F401
 from .plugin.commands import (  # noqa: E402, F401
-    CompletionSimpleAICommand,
-    InstructSimpleAICommand,
+    CompletionSimpleAiCommand,
+    InstructSimpleAiCommand,
     OpenNewTabWithContentCommand,
     ReplaceTextCommand,
 )
