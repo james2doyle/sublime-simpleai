@@ -169,6 +169,7 @@ class CompletionSimpleAiCommand(SimpleAiBaseCommand):
             "temperature": settingsc.get("temperature", 0),
             "top_p": settingsc.get("top_p", 1),
             "max_tokens": settingsc.get("max_tokens", 100),
+            "reasoning_effort": settingsc.get("reasoning_effort", "auto"),
         }
 
     def on_api_success(self, thread: "AsyncSimpleAI") -> None:
@@ -228,6 +229,7 @@ class InstructSimpleAiCommand(SimpleAiBaseCommand):
             ],
             "temperature": settingse.get("temperature", 0),
             "top_p": settingse.get("top_p", 1),
+            "reasoning_effort": settingse.get("reasoning_effort", "auto"),
         }
 
     def on_api_success(self, thread: "AsyncSimpleAI") -> None:

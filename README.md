@@ -84,6 +84,30 @@ In your `sublime-project` file:
 
 The settings code will check your local `sublime-project` first and then the global User `simple_ai.sublime-settings` file. So the project settings take priority.
 
+#### Reasoning Effort Control
+
+Simple AI supports controlling the reasoning effort for AI responses. The `reasoning_effort` parameter allows you to specify how much effort the AI should put into reasoning about your request.
+
+Available options:
+- `"auto"`: Let the AI automatically determine the appropriate reasoning effort
+- `"low"`: Use minimal reasoning effort (faster responses)
+- `"medium"`: Use moderate reasoning effort (balanced approach)
+- `"high"`: Use maximum reasoning effort (more thorough analysis)
+
+You can set this parameter for both completion and instruct commands:
+
+```jsonc
+{
+    "api_token": "YOUR_API_KEY_HERE",
+    "completions": {
+        "reasoning_effort": "auto"
+    },
+    "instruct": {
+        "reasoning_effort": "high"
+    }
+}
+```
+
 #### Custom Prompts
 
 You can also provide custom snippets for the prompts that are used during `instruct` and `completion` commands:
