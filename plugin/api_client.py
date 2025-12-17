@@ -71,10 +71,8 @@ class AsyncSimpleAI(threading.Thread):
             "Authorization": "Bearer {}".format(token)
         }
 
-        # Transform the Google API payload structure to OpenAI format
-        payload_for_body = self._transform_to_openai_payload(self.data.copy())
-
-        data_payload: str = json.dumps(payload_for_body)
+        # Use the payload directly (already in OpenAI format)
+        data_payload: str = json.dumps(self.data)
         logger.debug("API request data: {}".format(data_payload))
 
         logger.debug("API request path: {}".format(api_path))
@@ -129,41 +127,4 @@ class AsyncSimpleAI(threading.Thread):
 
         return content
 
-    def _transform_to_openai_payload(self, google_payload: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Transforms the Google Gemini API payload structure to OpenAI format.
-        """
-        openai_payload: Dict[str, Any] = {}
 
-        # Extract model from the original payload
-        if "model" in google_payload:
-            openai_payload["model"] = google_payload["model"]
-            del google_payload["model"]
-        else:
-            openai_payload["model"] = "openrouter/auto"  # Default OpenRouter model
-
-        # Transform contents to messages
-        contents = google_payload.get("contents", [])
-        if contents:
-            messages = []
-            for content_item in contents:
-                role = content_item.get("role", "user")
-                parts = content_item.get("parts", [])
-                if parts:
-                    # Combine all text parts into a single content string
-                    text_parts = [part.get("text", "") for part in parts if part.get("text")]
-                    content_text = " ".join(text_parts)
-                    messages.append({"role": role, "content": content_text})
-            openai_payload["messages"] = messages
-
-        # Transform generationConfig to top-level parameters
-        generation_config = google_payload.get("generationConfig", {})
-        if generation_config:
-            if "temperature" in generation_config:
-                openai_payload["temperature"] = generation_config["temperature"]
-            if "top_p" in generation_config:
-                openai_payload["top_p"] = generation_config["top_p"]
-            if "max_output_tokens" in generation_config:
-                openai_payload["max_tokens"] = generation_config["max_output_tokens"]
-
-        return openai_payload

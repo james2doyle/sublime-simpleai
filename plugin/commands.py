@@ -160,17 +160,15 @@ class CompletionSimpleAiCommand(SimpleAiBaseCommand):
 
         return {
             "model": settingsc.get("model", "openrouter/auto"),
-            "contents": [
+            "messages": [
                 {
                     "role": "user",
-                    "parts": [{"text": text_for_prompt}],
+                    "content": text_for_prompt,
                 }
             ],
-            "generationConfig": {
-                "temperature": settingsc.get("temperature", 0),
-                "top_p": settingsc.get("top_p", 1),
-                "max_output_tokens": settingsc.get("max_tokens", 100),
-            },
+            "temperature": settingsc.get("temperature", 0),
+            "top_p": settingsc.get("top_p", 1),
+            "max_tokens": settingsc.get("max_tokens", 100),
         }
 
     def on_api_success(self, thread: "AsyncSimpleAI") -> None:
@@ -222,16 +220,14 @@ class InstructSimpleAiCommand(SimpleAiBaseCommand):
 
         return {
             "model": settingse.get("model", "openrouter/auto"),
-            "contents": [
+            "messages": [
                 {
                     "role": "user",
-                    "parts": [{"text": text_for_prompt}],
+                    "content": text_for_prompt,
                 }
             ],
-            "generationConfig": {
-                "temperature": settingse.get("temperature", 0),
-                "top_p": settingse.get("top_p", 1),
-            },
+            "temperature": settingse.get("temperature", 0),
+            "top_p": settingse.get("top_p", 1),
         }
 
     def on_api_success(self, thread: "AsyncSimpleAI") -> None:
