@@ -1,5 +1,5 @@
 {
-	"debug_logging": true,
+	"debug_logging": false,
 	"api_token": "<put your OpenRouter API key here>",
 	"hostname": "openrouter.ai",
 	"max_seconds": 99,
