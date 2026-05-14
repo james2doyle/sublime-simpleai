@@ -1,4 +1,4 @@
-import http.client
+from http.client import HTTPResponse, HTTPConnection, HTTPSConnection
 import json
 import logging
 import threading
@@ -59,13 +59,17 @@ class AsyncSimpleAI(threading.Thread):
         """
         token: Union[str, None] = get_setting(self.view, "api_token", None)
         hostname: str = get_setting(self.view, "hostname", "openrouter.ai")
+        port: Union[int, None] = get_setting(self.view, "port", None)
+        use_http: bool = bool(get_setting(self.view, "use_http", None))
         model_name: str = self.data.get("model", "openrouter/auto")  # noqa: F841 -> is currently unused
-        api_path: str = "/api/v1/chat/completions"
+        api_path: str = get_setting(self.view, "api_path", "/api/v1/chat/completions")
 
         if token is None:
             raise ValueError("API token is missing.")
 
-        conn: http.client.HTTPSConnection = http.client.HTTPSConnection(hostname)
+        HTTPConnectionClass = HTTPConnection if use_http else HTTPSConnection
+        conn: Union[HTTPConnection, HTTPSConnection] = HTTPConnectionClass(hostname, port=port)
+
         headers: Dict[str, str] = {"Content-Type": "application/json", "Authorization": "Bearer {}".format(token)}
 
         # Use the payload directly (already in OpenAI format)
@@ -75,7 +79,7 @@ class AsyncSimpleAI(threading.Thread):
         logger.debug("API request path: {}".format(api_path))
 
         conn.request("POST", api_path, data_payload, headers)
-        response: http.client.HTTPResponse = conn.getresponse()
+        response: HTTPResponse = conn.getresponse()
         response_body: str = response.read().decode("utf-8")
         response_dict: Dict[str, Any] = json.loads(response_body)
         logger.debug("API response data: {}".format(response_dict))

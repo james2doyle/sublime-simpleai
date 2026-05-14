@@ -2,6 +2,9 @@
 	"debug_logging": false,
 	"api_token": "<put your OpenRouter API key here>",
 	"hostname": "openrouter.ai",
+	"port": null,
+	"use_http": false,
+	"api_path": "/api/v1/chat/completions",
 	"max_seconds": 99,
 	"no_empty_selection": false,
 	"completions": {
