@@ -59,17 +59,14 @@ class AsyncSimpleAI(threading.Thread):
         """
         token: Union[str, None] = get_setting(self.view, "api_token", None)
         hostname: str = get_setting(self.view, "hostname", "openrouter.ai")
-        model_name: str = self.data.get("model", "openrouter/auto")
+        model_name: str = self.data.get("model", "openrouter/auto")  # noqa: F841 -> is currently unused
         api_path: str = "/api/v1/chat/completions"
 
         if token is None:
             raise ValueError("API token is missing.")
 
         conn: http.client.HTTPSConnection = http.client.HTTPSConnection(hostname)
-        headers: Dict[str, str] = {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer {}".format(token)
-        }
+        headers: Dict[str, str] = {"Content-Type": "application/json", "Authorization": "Bearer {}".format(token)}
 
         # Use the payload directly (already in OpenAI format)
         data_payload: str = json.dumps(self.data)
@@ -95,7 +92,8 @@ class AsyncSimpleAI(threading.Thread):
         choices: List[Dict[str, Any]] = response_dict.get("choices", [])
         if not choices:
             raise ValueError(
-                "AI did not return any choices. The model might have generated no response or encountered an internal issue."
+                "AI did not return any choices. "
+                "The model might have generated no response or encountered an internal issue."
             )
 
         first_choice: Dict[str, Any] = choices[0]
@@ -108,9 +106,8 @@ class AsyncSimpleAI(threading.Thread):
                 usage_metadata = response_dict.get("usage", {})
                 total_token_count = usage_metadata.get("total_tokens", 0)
                 raise ValueError(
-                    "AI finished early due to max tokens limit. Used {} tokens. Try increasing 'max_tokens' in settings.".format(
-                        total_token_count
-                    )
+                    "AI finished early due to max tokens limit. "
+                    "Used {} tokens. Try increasing 'max_tokens' in settings.".format(total_token_count)
                 )
             elif finish_reason == "content_filter":
                 raise ValueError("AI response blocked by content filters.")
@@ -126,5 +123,3 @@ class AsyncSimpleAI(threading.Thread):
             raise ValueError("No text content found in AI response message.")
 
         return content
-
-

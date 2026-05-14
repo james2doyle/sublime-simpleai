@@ -44,7 +44,11 @@ class SimpleAiCommand(sublime_plugin.TextCommand):
             raise ValueError(msg)
 
     def handle_thread(
-        self, thread: "AsyncSimpleAI", label: str, on_success_callback: Callable[["AsyncSimpleAI"], None], seconds: int = 0
+        self,
+        thread: "AsyncSimpleAI",
+        label: str,
+        on_success_callback: Callable[["AsyncSimpleAI"], None],
+        seconds: int = 0,
     ) -> None:
         """
         Recursively checks the status of the AsyncSimpleAI thread and updates the UI
@@ -122,7 +126,8 @@ class SimpleAiBaseCommand(SimpleAiCommand):
         Internal method to prepare the data, create the thread, and start monitoring it.
         """
         command_name: str = self.get_command_info()
-        command_settings: Dict[str, Any] = get_setting(self.view, command_name)
+        # command_settings is currently unused
+        command_settings: Dict[str, Any] = get_setting(self.view, command_name)  # noqa: F841 -> is currently unused
 
         syntax_path: str = self.view.settings().get("syntax")
         syntax_name: str = syntax_path.split("/").pop().split(".")[0] if syntax_path else "plain text"
