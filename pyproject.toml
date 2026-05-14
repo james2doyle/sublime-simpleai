@@ -2,18 +2,20 @@
 name = "SimpleAI"
 version = "1.0.0"
 description = ""
-authors = ["James Doyle <james2doyle@gmail.com>"]
+authors = [
+    {name = "James Doyle", email = "james2doyle@gmail.com"}
+]
 license = "MIT"
 readme = "README.md"
+requires-python = ">=3.8"
 
-[project.dependencies]
-python = "^3.8" # Specify your Python version requirement
+[tool.setuptools.packages.find]
+where = ["plugin"]
 
 [project.optional-dependencies]
 dev = [
-    "pyright", # Add pyright as a development dependency
-    "pyrefly", # Add pyrefly as a development dependency
-    "ruff", # Add ruff as a development dependency
+    "pyright~= 1.1", # Add pyright as a development dependency
+    "ruff~=0.15", # Add ruff as a development dependency
 ]
 
 # Pyright Configuration
@@ -33,9 +35,7 @@ preview = true
 line-length = 120
 target-version = 'py38'
 include = ["*.py", "*.pyi", "*.ipynb", "../typings/**/*.pyi"]
-
-# [tool.pyrefly]
-# project_includes = ["**/*.py", "**/*.pyi", "../typings/**/*.pyi"]
-# search_path = [
-#     "./..."
-# ]
+lint.select = [
+    "E", # pycodestyle errors
+    "F", # pyflakes
+]
