@@ -21,12 +21,12 @@ dev = [
 # Pyright Configuration
 # See https://github.com/microsoft/pyright/blob/main/docs/configuration.md
 [tool.pyright]
-pythonVersion = '3.8'
-# Specify your source directory
-include = [".", "./plugin"]
+pythonVersion = "3.8"
+typeCheckingMode = "standard"
 reportMissingModuleSource = "none"
-reportIncompatibleMethodOverride = "none"
-stubPath = "../typings"
+# Specify your source directory
+include = ["./plugin"]
+stubPath = "./ST-API-stubs/typings"
 
 # Ruff Configuration
 # See https://docs.astral.sh/ruff/configuration/
@@ -34,7 +34,7 @@ stubPath = "../typings"
 preview = true
 line-length = 120
 target-version = 'py38'
-include = ["*.py", "*.pyi", "*.ipynb", "../typings/**/*.pyi"]
+include = ["plugin/**/*.py"]
 lint.select = [
     "E", # pycodestyle errors
     "F", # pyflakes

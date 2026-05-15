@@ -61,14 +61,12 @@ class SimpleAiCommand(sublime_plugin.TextCommand):
 
         if seconds > max_seconds:
             logger.debug("Thread for {} is maxed out".format(label))
-            msg: str = "Simple AI ran out of time! {}s".format(max_seconds)
-            sublime.status_message(msg)
+            sublime.status_message("Simple AI ran out of time! {}s".format(max_seconds))
             return
 
         if thread.running:
             logger.debug("Thread for {} is running".format(label))
-            msg: str = "Simple AI is thinking, one moment... ({}/{}s)".format(seconds, max_seconds)
-            sublime.status_message(msg)
+            sublime.status_message("Simple AI is thinking, one moment... ({}/{}s)".format(seconds, max_seconds))
             sublime.set_timeout(lambda: self.handle_thread(thread, label, on_success_callback, seconds + 1), 1000)
             return
 
