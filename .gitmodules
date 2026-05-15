@@ -1,0 +1,3 @@
+[submodule "ST-API-stubs"]
+	path = ST-API-stubs
+	url = https://github.com/jfcherng-sublime/ST-API-stubs.git
