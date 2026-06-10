@@ -2,7 +2,8 @@ from http.client import HTTPResponse, HTTPConnection, HTTPSConnection
 import json
 import logging
 import threading
-from typing import Any, Dict, List, Union
+import re
+from typing import Any, Dict, List, Union, Match
 
 import sublime
 
@@ -52,6 +53,19 @@ class AsyncSimpleAI(threading.Thread):
         finally:
             self.running = False
 
+    @staticmethod
+    def get_connection_class(hostname: str) -> Union[HTTPConnection, HTTPSConnection]:
+        match: Union[Match, None] = re.match(r"^(?:(?P<protocol>http|https)://)?(?P<endpoint>.*)", hostname)
+
+        if not match:
+            # This can actual almost never happen as even empty strings will match
+            raise ValueError(f"Invalid hostname format: {hostname}")
+
+        protocol, endpoint = match.group("protocol"), match.group("endpoint")
+
+        HTTPConnectionClass = HTTPConnection if protocol == "http" else HTTPSConnection
+        return HTTPConnectionClass(endpoint)
+
     def get_ai_response(self) -> str:
         """
         Passes the given data to the API, returning the response.
@@ -59,16 +73,12 @@ class AsyncSimpleAI(threading.Thread):
         """
         token: Union[str, None] = get_setting(self.view, "api_token", None)
         hostname: str = get_setting(self.view, "hostname", "openrouter.ai")
-        port: Union[int, None] = get_setting(self.view, "port", None)
-        use_http: bool = bool(get_setting(self.view, "use_http", None))
-        model_name: str = self.data.get("model", "openrouter/auto")  # noqa: F841 -> is currently unused
         api_path: str = get_setting(self.view, "api_path", "/api/v1/chat/completions")
 
         if token is None:
             raise ValueError("API token is missing.")
 
-        HTTPConnectionClass = HTTPConnection if use_http else HTTPSConnection
-        conn: Union[HTTPConnection, HTTPSConnection] = HTTPConnectionClass(hostname, port=port)
+        conn: Union[HTTPConnection, HTTPSConnection] = self.get_connection_class(hostname)
 
         headers: Dict[str, str] = {"Content-Type": "application/json", "Authorization": "Bearer {}".format(token)}
 

@@ -60,6 +60,17 @@ Add your API key to the `simple_ai.sublime-settings` file:
 
 Important: Replace `"YOUR_API_KEY_HERE"` with your actual API key.
 
+#### Custom endpoint
+In case you want to utilize a custom endpoint, for example, a self-hosted [Ollama](https://ollama.com/) instance or any other OpenAI compatible frontend ([LM Studio](https://lmstudio.ai/), [oMLX](https://omlx.ai/), etc.), you should adjust the `hostname` in your settings. Let's say you are running a local Ollama instance on port 11434 you should add:
+
+```jsonc
+{
+    "hostname": "http://127.0.0.1:11434"
+}
+```
+
+Both `http` and `https` prefixes can be used. When none is specified, `https` is assumed.
+
 #### Project Configuration
 
 You can also configure the `api_token` on the project level.
