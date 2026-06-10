@@ -5,7 +5,7 @@ description = ""
 authors = [
     {name = "James Doyle", email = "james2doyle@gmail.com"}
 ]
-license = "MIT"
+license = {text = "MIT License"}
 readme = "README.md"
 requires-python = ">=3.8"
 
