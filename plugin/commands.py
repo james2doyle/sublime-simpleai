@@ -126,8 +126,6 @@ class SimpleAiBaseCommand(SimpleAiCommand):
         Internal method to prepare the data, create the thread, and start monitoring it.
         """
         command_name: str = self.get_command_info()
-        # command_settings is currently unused
-        command_settings: Dict[str, Any] = get_setting(self.view, command_name)  # noqa: F841 -> is currently unused
 
         syntax_path: str = self.view.settings().get("syntax")
         syntax_name: str = syntax_path.split("/").pop().split(".")[0] if syntax_path else "plain text"
