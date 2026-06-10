@@ -24,9 +24,10 @@ dev = [
 pythonVersion = "3.8"
 typeCheckingMode = "standard"
 reportMissingModuleSource = "none"
+reportIncompatibleMethodOverride = "none"
 # Specify your source directory
 include = ["./plugin"]
-stubPath = "./ST-API-stubs/typings"
+stubPath = "./LSP/stubs"
 
 # Ruff Configuration
 # See https://docs.astral.sh/ruff/configuration/
