@@ -16,7 +16,7 @@ jobs:
       - name: install uv
         run: pip install uv
       - name: Install package and dependencies
-        run: uv sync --extra dev
+        run: uv sync --locked --extra dev
       - name: Run Ruff
         run: uv run ruff check 
       - name: Run Pyright
