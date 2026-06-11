@@ -57,7 +57,7 @@ wheels = [
 [[package]]
 name = "simpleai"
 version = "1.0.0"
-source = { virtual = "." }
+source = { editable = "." }
 
 [package.optional-dependencies]
 dev = [

@@ -12,6 +12,10 @@ requires-python = ">=3.8"
 [tool.setuptools.packages.find]
 where = ["plugin"]
 
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
 [project.optional-dependencies]
 dev = [
     "pyright~= 1.1", # Add pyright as a development dependency
@@ -35,8 +39,11 @@ stubPath = "./LSP/stubs"
 preview = true
 line-length = 120
 target-version = 'py38'
-include = ["plugin/**/*.py"]
+include = ["plugin/**/*.py", "tests/**/*.py"]
 lint.select = [
     "E", # pycodestyle errors
     "F", # pyflakes
 ]
+
+[tool.pytest.ini_options]
+testpaths = "tests/"
