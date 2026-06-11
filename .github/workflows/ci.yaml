@@ -21,5 +21,13 @@ jobs:
         run: uv run ruff check 
       - name: Run Pyright
         run: uv run pyright
-          
-          
+  run-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: SublimeText/UnitTesting/actions/setup@v1
+        with:
+          package-name: SimpleAI
+      - uses: SublimeText/UnitTesting/actions/run-tests@v1
+        with:
+          package-name: SimpleAI
