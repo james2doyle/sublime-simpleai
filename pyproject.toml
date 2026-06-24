@@ -1,9 +1,10 @@
 [project]
 name = "SimpleAI"
-version = "1.0.0"
-description = ""
+version = "1.1.0"
+description = "Use OpenAI compatible APIs inside Sublime Text 4"
 authors = [
-    {name = "James Doyle", email = "james2doyle@gmail.com"}
+    {name = "James Doyle", email = "james2doyle@gmail.com"},
+    {name = "Martijn Jacobs", email = "martijn@mj026.nl"}
 ]
 license = {text = "MIT License"}
 readme = "README.md"
