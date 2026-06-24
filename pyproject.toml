@@ -31,7 +31,7 @@ reportMissingModuleSource = "none"
 reportIncompatibleMethodOverride = "none"
 # Specify your source directory
 include = ["./plugin"]
-stubPath = "./LSP/stubs"
+stubPath = "./stubs"
 
 # Ruff Configuration
 # See https://docs.astral.sh/ruff/configuration/

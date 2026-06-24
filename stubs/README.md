@@ -1,0 +1,1 @@
+These stubs are copied from the [Sublime LSP repository](https://github.com/sublimelsp/LSP), see the included [MIT License](./LICENSE) file.
