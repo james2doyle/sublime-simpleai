@@ -1,0 +1,33 @@
+name: CI
+on: [push, pull_request]
+
+jobs:
+  run-linting:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v6
+        with:
+          submodules: true        
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+           python-version: '3.8'  # Sublime Text uses Python 3.8
+      - name: install uv
+        run: pip install uv
+      - name: Install package and dependencies
+        run: uv sync --locked --extra dev
+      - name: Run Ruff
+        run: uv run ruff check 
+      - name: Run Pyright
+        run: uv run pyright
+  run-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: SublimeText/UnitTesting/actions/setup@v1
+        with:
+          package-name: SimpleAI
+      - uses: SublimeText/UnitTesting/actions/run-tests@v1
+        with:
+          package-name: SimpleAI

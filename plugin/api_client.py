@@ -1,8 +1,9 @@
-import http.client
+from http.client import HTTPResponse, HTTPConnection, HTTPSConnection
 import json
 import logging
 import threading
-from typing import Any, Dict, List, Union
+import re
+from typing import Any, Dict, List, Union, Match
 
 import sublime
 
@@ -52,6 +53,19 @@ class AsyncSimpleAI(threading.Thread):
         finally:
             self.running = False
 
+    @staticmethod
+    def get_connection_class(hostname: str) -> Union[HTTPConnection, HTTPSConnection]:
+        match: Union[Match, None] = re.match(r"^(?:(?P<protocol>http|https)://)?(?P<endpoint>.*)", hostname)
+
+        if not match:
+            # This can actual almost never happen as even empty strings will match
+            raise ValueError(f"Invalid hostname format: {hostname}")
+
+        protocol, endpoint = match.group("protocol"), match.group("endpoint")
+
+        HTTPConnectionClass = HTTPConnection if protocol == "http" else HTTPSConnection
+        return HTTPConnectionClass(endpoint)
+
     def get_ai_response(self) -> str:
         """
         Passes the given data to the API, returning the response.
@@ -59,17 +73,14 @@ class AsyncSimpleAI(threading.Thread):
         """
         token: Union[str, None] = get_setting(self.view, "api_token", None)
         hostname: str = get_setting(self.view, "hostname", "openrouter.ai")
-        model_name: str = self.data.get("model", "openrouter/auto")
-        api_path: str = "/api/v1/chat/completions"
+        api_path: str = get_setting(self.view, "api_path", "/api/v1/chat/completions")
 
         if token is None:
             raise ValueError("API token is missing.")
 
-        conn: http.client.HTTPSConnection = http.client.HTTPSConnection(hostname)
-        headers: Dict[str, str] = {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer {}".format(token)
-        }
+        conn: Union[HTTPConnection, HTTPSConnection] = self.get_connection_class(hostname)
+
+        headers: Dict[str, str] = {"Content-Type": "application/json", "Authorization": "Bearer {}".format(token)}
 
         # Use the payload directly (already in OpenAI format)
         data_payload: str = json.dumps(self.data)
@@ -78,7 +89,7 @@ class AsyncSimpleAI(threading.Thread):
         logger.debug("API request path: {}".format(api_path))
 
         conn.request("POST", api_path, data_payload, headers)
-        response: http.client.HTTPResponse = conn.getresponse()
+        response: HTTPResponse = conn.getresponse()
         response_body: str = response.read().decode("utf-8")
         response_dict: Dict[str, Any] = json.loads(response_body)
         logger.debug("API response data: {}".format(response_dict))
@@ -95,7 +106,8 @@ class AsyncSimpleAI(threading.Thread):
         choices: List[Dict[str, Any]] = response_dict.get("choices", [])
         if not choices:
             raise ValueError(
-                "AI did not return any choices. The model might have generated no response or encountered an internal issue."
+                "AI did not return any choices. "
+                "The model might have generated no response or encountered an internal issue."
             )
 
         first_choice: Dict[str, Any] = choices[0]
@@ -108,9 +120,8 @@ class AsyncSimpleAI(threading.Thread):
                 usage_metadata = response_dict.get("usage", {})
                 total_token_count = usage_metadata.get("total_tokens", 0)
                 raise ValueError(
-                    "AI finished early due to max tokens limit. Used {} tokens. Try increasing 'max_tokens' in settings.".format(
-                        total_token_count
-                    )
+                    "AI finished early due to max tokens limit. "
+                    "Used {} tokens. Try increasing 'max_tokens' in settings.".format(total_token_count)
                 )
             elif finish_reason == "content_filter":
                 raise ValueError("AI response blocked by content filters.")
@@ -126,5 +137,3 @@ class AsyncSimpleAI(threading.Thread):
             raise ValueError("No text content found in AI response message.")
 
         return content
-
-

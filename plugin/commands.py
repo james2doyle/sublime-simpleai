@@ -44,7 +44,11 @@ class SimpleAiCommand(sublime_plugin.TextCommand):
             raise ValueError(msg)
 
     def handle_thread(
-        self, thread: "AsyncSimpleAI", label: str, on_success_callback: Callable[["AsyncSimpleAI"], None], seconds: int = 0
+        self,
+        thread: "AsyncSimpleAI",
+        label: str,
+        on_success_callback: Callable[["AsyncSimpleAI"], None],
+        seconds: int = 0,
     ) -> None:
         """
         Recursively checks the status of the AsyncSimpleAI thread and updates the UI
@@ -61,14 +65,12 @@ class SimpleAiCommand(sublime_plugin.TextCommand):
 
         if seconds > max_seconds:
             logger.debug("Thread for {} is maxed out".format(label))
-            msg: str = "Simple AI ran out of time! {}s".format(max_seconds)
-            sublime.status_message(msg)
+            sublime.status_message("Simple AI ran out of time! {}s".format(max_seconds))
             return
 
         if thread.running:
             logger.debug("Thread for {} is running".format(label))
-            msg: str = "Simple AI is thinking, one moment... ({}/{}s)".format(seconds, max_seconds)
-            sublime.status_message(msg)
+            sublime.status_message("Simple AI is thinking, one moment... ({}/{}s)".format(seconds, max_seconds))
             sublime.set_timeout(lambda: self.handle_thread(thread, label, on_success_callback, seconds + 1), 1000)
             return
 
@@ -124,7 +126,6 @@ class SimpleAiBaseCommand(SimpleAiCommand):
         Internal method to prepare the data, create the thread, and start monitoring it.
         """
         command_name: str = self.get_command_info()
-        command_settings: Dict[str, Any] = get_setting(self.view, command_name)
 
         syntax_path: str = self.view.settings().get("syntax")
         syntax_name: str = syntax_path.split("/").pop().split(".")[0] if syntax_path else "plain text"
@@ -214,10 +215,10 @@ class InstructSimpleAiCommand(SimpleAiBaseCommand):
     def get_command_info(self) -> str:
         return "instruct"
 
-    def get_prompt_data(self, source_code: str, user_input: str) -> Dict[str, Any]:
+    def get_prompt_data(self, source_code: str, user_input: Union[str, None] = None) -> Dict[str, Any]:
         settingse: Dict[str, Any] = get_setting(self.view, self.get_command_info())
 
-        text_for_prompt = evaluate_instruction_snippet(self.view, user_input, source_code)
+        text_for_prompt = evaluate_instruction_snippet(self.view, user_input or "", source_code)
 
         return {
             "model": settingse.get("model", "openrouter/auto"),
